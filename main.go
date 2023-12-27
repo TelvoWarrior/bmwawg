@@ -34,5 +34,4 @@ func main() {
 	http.HandleFunc("/about", About)
 
 	_ = http.ListenAndServe(portNumber, nil)
-
 }
