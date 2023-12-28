@@ -1,7 +1,8 @@
 package render
 
 import (
-	"fmt"
+	"bytes"
+	"log"
 	"net/http"
 	"path/filepath"
 	"text/template"
@@ -10,15 +11,28 @@ import (
 // RenderTemplate renders templates using html/template
 func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	// create a template cache
+	tc, err := createTemplateCache()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// get requested template from cache
+	t, ok := tc[tmpl]
+	if !ok {
+		log.Fatal(err)
+	}
+
+	buf := new(bytes.Buffer)
+
+	err = t.Execute(buf, nil)
+	if err != nil {
+		log.Println(err)
+	}
 
 	// render the template
-	parsedTemplate, _ := template.ParseFiles("./templates/"+tmpl, "./templates/base.layout.tmpl")
-	err := parsedTemplate.Execute(w, nil)
+	_, err = buf.WriteTo(w)
 	if err != nil {
-		fmt.Println("error parsing template", err)
-		return
+		log.Println(err)
 	}
 }
 
